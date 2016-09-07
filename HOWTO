@@ -1,0 +1,22 @@
+#! /usr/bin/env bash
+common_args=(
+--no-out-link
+--argstr version $(date +%Y.%m.%d)
+--arg username 'with builtins; (fromJSON (readFile ~/.factorio/player-data.json)).service-username'
+--arg token 'with builtins; (fromJSON (readFile ~/.factorio/player-data.json)).service-token'
+)
+
+#set -eo pipefail
+
+# To update local hashCache and build nars for all the latest releases:
+# FIXME: `nextCache` attr doesn't actually run the nix-prefetch-url commands
+#FIXME#nix-build "${common_args[@]}" -A factorio-utils.channel-management.nextCache | xargs -i sudo cp {} /var/cache/factorio-mods-hashCache.nix
+tmpCache=$(mktemp)
+$(nix-build "${common_args[@]}" -A factorio-utils.channel-management.updater) > $tmpCache && sudo cp $tmpCache /var/cache/factorio-mods-hashCache.nix; rm -f $tmpCache
+# Realize the mods and produce nars. This one can take a long time, until the hashes get persisted into the db.
+nix-build "${common_args[@]}" -A factorio-utils.channel-management.latestMods | sudo xargs nix copy --to file:///tmp/factorio-mods-cache
+
+# To generate and use channel locally:
+nix-build "${common_args[@]}" -A factorio-utils.channel-management.latestChannel | xargs -i nix-channel --add file://{} factorio-mods
+nix-channel --update factorio-mods
+# Make sure your NIX_PATH is set to use /nix/var/nix/profiles/per-user/$USER/channels , and not .../root/channels, unless you're root, of course.

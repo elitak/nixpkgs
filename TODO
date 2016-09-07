@@ -1,0 +1,50 @@
+nix-channel is probably the idiom for updating nixexprs.tar.xz from factorio-mods channel, i'll update that with a script server-side, and mirror the files themselves passwordless. torrents will be used by the derivations to minimize bandwidth used.
+
+nixos: factorio: download mod manifest, install it into store as converted into nix, then at build time in nixos module, fetch using login info
+nixos: factorio: how to avoid password use? mirror the mods + client download sites myself? use torrents? integrate torrents into nix-fetch?
+nixos: factorio: TODO test in nixpkgs on regular linux, then post a tutorial on how to quickly use to forums. should be more expedient than any other method for even inexperienced linux users.
+
+
+see https://github.com/narc0tiq/factorio-updater/blob/master/update_factorio.py for api usage
+
+
+
+purge all refs to "(upstream)manifest" -> "modIndex"
+
+before committing, recheck and explain the problem:
+
+all the complexity in the process is because:
+  [runtime info: date] first drv uses incrementing date to fetch json modIndex
+  [state maintained outside of store/drvs] then hashCacheUpdater has to run prefetch to compute the sha256s
+  ... that are then used to compose mods.nix
+  ... that are built into nixexprs.tar.xz, distributed, reimported
+  ... and finally used in nixos module or .nixpkgs/config.nix
+
+
+problems are:
+  modIndex state and drv can change hundreds of time a day, so `date` version needs to be supplied at runtime by cronjob.
+    How to address this in the context of nixos modules? I'd rather do away with cronjob nix-build hacks
+  sha256 state cant be pulled in a single modIndex fetch, need to dl and compute each
+    Contact devs about computing the hashes for the files for me, once I can give them the algo as code or reference to code, or tell them to run:
+      nix-hash /nix/store/c5pffwrlmh8a1pi9l6ba2k3767b852kb-alien-science-0.1.2.zip --type sha256 --base32 --flat
+      (sha256 is not default, nor is the base32 alphabet, nor is flat-mode i.e. do not unzip and canonicalize dates/perms and hash contents [ maybe i would want this? how to get nix-build to hash them this way?])
+
+
+so goals are:
+  do away with hashCache
+  do away with cronning nix-build and all the env hassles, or at least get it down to 1 invocation of nix-build && ./result
+    ( solution may be to just not use fromJSON . readFile? )
+
+somewhere in the api there has to be a checksum of each release. i can maintain a table of these to avoid having to redownload and hash the releases I already have in hashes.nix and the store
+
+release.dependencies
+
+ask where the api docs are
+ask if there is checksum or request feature on forums. same devs maintain the mod db?
+
+investigate if any talk of "fetchtorrent" exists. use that to serve binary package caceh of all mods
+
+
+try using ./nixos/lib/make-channel.nix
+
+final problem with factorio-mods-channel.nix is that 1.12 never wants to add sigs to binary store under any circumstance, and even manually added 'Sig{s,nature{,s}' fields do not work?!
