@@ -1,0 +1,13 @@
+
+          # There needs to be a single, canonical src derivation hash chain. While the <hash>-modname.zip files in store are usuable by all src-drvs, and are thus nix-prefechable, the same does not apply for the final cached binary derivations. They will change as soon as any element of the src drv (including whats passed to fetchMod here) is changed. This presents a problem for caching when user/token auth is required to fetch the mods from upstream. The current plan, which I'm deferring for right now, is to provide my own mirror as the canonical url. The prefetches will use the username/token and nothing else. That way, the final listed derivations can be fetched from my binary cache or built from my mirror. This is sorta silly really, as the build is super-trivial and I'll be mirroring 2x the data. I really need to get passwordless downloads added by the devs...
+          # I think i've made a bad assumption, above. in the final mod drv, src=/nix/store/hash-modname.zip, so the src.drv changing shouldnt matter. this is what i originally thought, but for some reason i'm still getting different final hashes on my client vs. the server, so the binary cache is never used... FIXME
+          # WRONG>>>> binary caches are all about CONTENTS. the hashes in nix store are all based on whats inside the file. the drvs are different, but the outputs should yield the same hashes. tthis is what nix-bulid --check is about. it compares the actual build with the hash calculated by what's actually emitted by the local build. Thus, src.drv hashes and contents shouldnt even matter...
+          # Current idea is to sub in nix/store/paths in place of fetchMod to canonicalize! this is hard. try static fallback again
+          # So why then are my final binary cached pkgs still diff hashes??
+
+
+must not be anything that courld include other derivations, icncluding the version of curl used, lol. so that rules out all fetch functions.
++          # i'll have to use null or /nix/store/actualmod.zip
++          # even still, every time stdenv changes, theres a new set of hashes...
++          # better off just hostign the src zips myself and skipping binary cache entirely?
+
