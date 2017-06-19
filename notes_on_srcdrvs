@@ -11,3 +11,6 @@ must not be anything that courld include other derivations, icncluding the versi
 +          # even still, every time stdenv changes, theres a new set of hashes...
 +          # better off just hostign the src zips myself and skipping binary cache entirely?
 
+
+as soon as i downgraded nile to nix 1.11 it fetched cached mods okay... go figure, guess I'm still in the dark on how hashes are checked 
+ (this was with 1.12 still running on cache.xor.us, so total hash (one that includes nix ver is calculation) doesnt seem to matter)

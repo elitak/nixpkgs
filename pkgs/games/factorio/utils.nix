@@ -179,7 +179,8 @@ in rec {
                   , binaryCacheURL ? null
                   }:
   let
-    channelName = "factorio-mods";
+    # HACK appending version only until newest nix is made stable that checks for name collision when unpacking channel
+    channelName = "factorio-mods-${version}";
   in stdenv.mkDerivation {
     name = "factorio-mods-channel-${version}";
     preferLocalBuild = true;
