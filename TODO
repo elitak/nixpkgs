@@ -48,3 +48,5 @@ investigate if any talk of "fetchtorrent" exists. use that to serve binary packa
 try using ./nixos/lib/make-channel.nix
 
 final problem with factorio-mods-channel.nix is that 1.12 never wants to add sigs to binary store under any circumstance, and even manually added 'Sig{s,nature{,s}' fields do not work?!
+
+move parts of utils.nix into build-support? like the mkModDrv stuff?
