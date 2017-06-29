@@ -41,9 +41,8 @@ let
     nix copy --to "file://${binaryCacheDir}" $mods
 
     # Generate channel
-    chan=$(nix-build -A factorio-utils.channel-management.latestChannel --argstr binaryCacheURL '${binaryCacheURL}')
     mkdir -p $(dirname "${channelPath}")
-    ln -sfn "$chan" "${channelPath}"
+    nix-build -A factorio-utils.channel-management.latestChannel --argstr binaryCacheURL '${binaryCacheURL}' -o "${channelPath}"
   '';
 
 in
@@ -53,7 +52,7 @@ in
     # TODO use unpriv-as-possible user
     # HACK here with nixos path set to home checkout temporarily
     systemCronJobs = [
-      "00 04 * * * root NIX_PATH=nixos=/home/keb/nixpkgs ${updateEverything}"
+      "23 04 * * * root NIX_PATH=nixos=/home/keb/nixpkgs ${updateEverything}"
       # TODO : push them and default.nix to http host
     ];
   };

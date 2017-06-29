@@ -192,7 +192,8 @@ in rec {
 
       mkdir -p $out
       ${if binaryCacheURL != null then "echo -n ${binaryCacheURL} > $out/binary-cache-url" else ""}
-      tar cJf $out/nixexprs.tar.xz ${channelName}
+      tar cJf $out/nixexprs.tar.xz  ${channelName}
+      tar cjf $out/nixexprs.tar.bz2 ${channelName}
     '';
   };
 
