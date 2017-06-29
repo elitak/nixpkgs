@@ -10,7 +10,7 @@ let
   binaryCacheDir = "/srv/www/cache";
   binaryCacheURL = https://cache.xor.us;
   channelPath = "${binaryCacheDir}/channels/factorio-mods";
-  signingKey = /home/keb/cache.xor.us-1.key; #XXX get leaked in public store! #PRIVSTORE
+  signingKey = ./cache.xor.us-1.key; #XXX get leaked in public store! #PRIVSTORE
 
   updateEverything = writeScript "update-factorio-mods-channel.sh" ''
     #!${stdenv.shell}
