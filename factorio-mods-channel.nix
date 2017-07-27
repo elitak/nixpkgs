@@ -60,6 +60,19 @@ in
 
 
 /* TODO use a systemd timer instead of cron, something like:
+
+
+   (ack oneshot in nixos/modules for examples)
+
+   (also use something like this to get the proper build env:
+
+     environment = config.nix.envVars //
+           { inherit (config.environment.sessionVariables) NIX_PATH;
+                 HOME = "/root";
+           }; 
+     path = [ pkgs.coreutils pkgs.xz.bin config.nix.package.out ]; #config.nix.package.out is "nix-build" etc
+   )
+
  systemd.timers = flip mapAttrs' cfg.certs (cert: data: nameValuePair
         ("acme-${cert}")
         ({
